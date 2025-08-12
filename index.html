@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+            background: white;
+            color: black;
+        }
+        .btn-translate {
+            background: #ff7f50;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            margin-top: 15px;
+            width: 100%;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-translate:hover {
+            background: #ff6347;
+        }
+        #translated-text {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ffcc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Language Translator</h1>
+        <label for="source-lang">Select Source Language:</label>
+        <select id="source-lang">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="nl">Dutch</option>
+            <option value="ru">Russian</option>
+        </select>
+
+        <label for="target-lang">Select Target Language:</label>
+        <select id="target-lang">
+            <option value="es">Spanish</option>
+            <option value="en">English</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="nl">Dutch</option>
+            <option value="ru">Russian</option>
+        </select>
+
+        <label for="input-text">Enter Text:</label>
+        <textarea id="input-text" rows="3" placeholder="Type text to translate..."></textarea>
+
+        <button class="btn-translate" onclick="translateText()">Translate</button>
+
+        <h2 id="translated-text"></h2>
+    </div>
+
+    <script>
+        function translateText() {
+            const sourceLang = document.getElementById('source-lang').value;
+            const targetLang = document.getElementById('target-lang').value;
+            const text = document.getElementById('input-text').value;
+            
+            if (!text.trim()) {
+                alert("Please enter text to translate.");
+                return;
+            }
+
+            fetch('/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, source_lang: sourceLang, target_lang: targetLang })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Backend error:", data.error);
+                    document.getElementById('translated-text').innerText = "Translation failed.";
+                } else {
+                    document.getElementById('translated-text').innerText = data.translated_text;
+                }
+            })
+            .catch(error => {
+                console.error('Request failed:', error);
+                document.getElementById('translated-text').innerText = "Error connecting to server.";
+            });
+        }
+    </script>
+</body>
+</html>
